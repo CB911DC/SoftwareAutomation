@@ -17,10 +17,11 @@ if (-Not (Test-Path $profilepath)) {
   New-Item -Path $profilepath -ItemType File
 }
 
+
 $checkExists = $(Select-String -Path $profilepath -Pattern "New-Alias .*$aliasName .*")
 if ($checkExists) {
   Write-Output "the alias seems to exist .. skipping"
   Write-Output "$checkExists"
 } else {
-  "New-Alias -Name $aliasName -Value $aliasTarget" | Out-File -Append $profilepath
+  "`nNew-Alias -Name $aliasName -Value $aliasTarget" | Out-File -Append $profilepath -Encoding utf8
 }
