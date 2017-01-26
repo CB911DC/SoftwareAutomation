@@ -5,7 +5,7 @@ echo ==================================================
 echo ============= WRAP POWERSHELL SCRIPT =============
 echo ==================================================
 
-echo calling %psscript% ksbuild with args %*
+echo calling %psscript% with args %*
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%psscript%' %*"
 
 echo ==================================================
