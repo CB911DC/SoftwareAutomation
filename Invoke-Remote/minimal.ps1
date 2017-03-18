@@ -19,6 +19,6 @@ Restart-Service WinRM -Force
 if (Test-PendingReboot) { Invoke-Reboot }
 
 # basically necessary for any PC ;-)
-cinstm notepadplusplus
-cinstm 7zip
-cinstm firefox
+cinst notepadplusplus
+cinst 7zip
+cinst firefox
