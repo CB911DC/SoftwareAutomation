@@ -10,6 +10,7 @@ Disable-InternetExplorerESC
 Disable-UAC
 Disable-GameBarTips
 
+# required for usage of 'Invoke-Remote'
 Enable-PSRemoting -Force
 Set-WSManQuickConfig -SkipNetworkProfileCheck -Force
 Set-Item wsman:\localhost\client\trustedhosts * -Force
@@ -17,6 +18,7 @@ Restart-Service WinRM -Force
 
 if (Test-PendingReboot) { Invoke-Reboot }
 
+# basically necessary for any PC ;-)
 cinstm notepadplusplus
 cinstm 7zip
 cinstm firefox
