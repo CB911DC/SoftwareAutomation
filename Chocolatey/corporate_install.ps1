@@ -2,8 +2,8 @@ param (
   [Parameter(Mandatory = $False)]
   [switch]$CreateSystemRestorePoint,
 
-	[Parameter(Mandatory = $False)]
-	[bool]$RemoveCommunityRepo = $True,
+  [Parameter(Mandatory = $False)]
+  [bool]$RemoveCommunityRepo = $True,
 
   [Parameter(Mandatory = $False)]
   [string]$ChocolateyURL = "https://choco-at-myorg.com/chocolatey/chocolatey.nupkg",
@@ -11,17 +11,17 @@ param (
   [Parameter(Mandatory = $False)]
   [string]$7zaDownloadURL = "https://choco-at-myorg.com/chocolatey/7za.exe",
 
-	[Parameter(Mandatory = $False)]
-	[string]$NetFx4FullUrl = 'https://choco-at-myorg.com/chocolatey/dotNetFx40_Full_x86_x64.exe',
+  [Parameter(Mandatory = $False)]
+  [string]$NetFx4FullUrl = 'https://choco-at-myorg.com/chocolatey/dotNetFx40_Full_x86_x64.exe',
 	
-	[Parameter(Mandatory = $False)]
-	$CustomRepositories = @{"myorg-choco"="https://choco-at-myorg.com/nuget/choco/"},
+  [Parameter(Mandatory = $False)]
+  $CustomRepositories = @{"myorg-choco" = "https://choco-at-myorg.com/nuget/choco/"},
 
-	[Parameter(Mandatory = $False)]
-	[bool]$RequireBoxstarter = $True,
+  [Parameter(Mandatory = $False)]
+  [bool]$RequireBoxstarter = $True,
 
-	[Parameter(Mandatory = $False)]
-	[string[]]$AdditonalPackages = @("PowerShell","myorg-choco-patches")
+  [Parameter(Mandatory = $False)]
+  [string[]]$AdditonalPackages = @("PowerShell", "myorg-choco-patches")
 )
 
 # chocolatey install script
@@ -276,29 +276,29 @@ if (![System.IO.Directory]::Exists($chocoPkgDir)) { [System.IO.Directory]::Creat
 Copy-Item "$file" "$nupkg" -Force -ErrorAction SilentlyContinue
 
 if ($RemoveCommunityRepo) {
-	powershell.exe -Command choco source remove -name chocolatey
+  powershell.exe -Command choco source remove -name chocolatey
 }
 
 if ($CustomRepositories) {
-	foreach ($repo in $CustomRepositories.Keys) {
-		powershell.exe -Command choco source add -name $repo -s "$($CustomRepositories[$repo])"	
-	}
+  foreach ($repo in $CustomRepositories.Keys) {
+    powershell.exe -Command choco source add -name $repo -s "$($CustomRepositories[$repo])"	
+  }
 }
 
 if ($RequireBoxstarter) {
-	powershell.exe -Command choco install boxstarter -y	
+  powershell.exe -Command choco install boxstarter -y	
 }
 
 if ($AdditonalPackages) {
-	$pkgstring = $AdditonalPackages -join " "
-	if (-Not $RequireBoxstarter) {
-		powershell.exe -Command choco install $pkgstring -y
-	}
-	else {
-		$boxstarterScript = Join-Path $tempDir "chocosetup_boxstarter.ps1"
-		$boxstarterPackage = Join-Path $tempDir "chocosetup_boxstarter_install.ps1"
-		$tmpPkgName = "ChocolateySetup_Boxstarter_Helper"
-@"
+  $pkgstring = $AdditonalPackages -join " "
+  if (-Not $RequireBoxstarter) {
+    powershell.exe -Command choco install $pkgstring -y
+  }
+  else {
+    $boxstarterScript = Join-Path $tempDir "chocosetup_boxstarter.ps1"
+    $boxstarterPackage = Join-Path $tempDir "chocosetup_boxstarter_install.ps1"
+    $tmpPkgName = "ChocolateySetup_Boxstarter_Helper"
+    @"
 Import-Module Boxstarter.Bootstrapper
 Import-Module Boxstarter.Chocolatey
 New-PackageFromScript $boxstarterPackage $tmpPkgName
@@ -313,18 +313,18 @@ New-PackageFromScript $boxstarterPackage $tmpPkgName
 Install-BoxstarterPackage $tmpPkgName -Credential `$_cred
 "@ | Out-File $boxstarterScript -Encoding default
 
-@"
+    @"
 `$Boxstarter.RebootOk=`$true
 `$Boxstarter.NoPassword=`$false
 `$Boxstarter.AutoLogin=`$true
 "@ | Out-File $boxstarterPackage -Encoding default
 
-		foreach ($pkg in $AdditonalPackages) {
-@"
+    foreach ($pkg in $AdditonalPackages) {
+      @"
 choco install $pkg -y
 if (Test-PendingReboot) { Invoke-Reboot }
 "@ | Out-File $boxstarterPackage -Encoding default -Append
-		}
-		powershell.exe -file $boxstarterScript
-	}
+    }
+    powershell.exe -file $boxstarterScript
+  }
 }
