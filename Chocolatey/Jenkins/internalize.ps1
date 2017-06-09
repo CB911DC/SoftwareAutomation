@@ -15,9 +15,9 @@
 
 function InternalizePkg($pkg) {
 	Push-Location $tmpdir
-	choco download --recompile $pkg --resources-location="$uncshare\$pkg" -source="$basefeed"
+	choco download --internalize $pkg --resources-location="$uncshare\$pkg" --source="$basefeed"
 	$genpkg = ((Get-ChildItem *.nupkg -recurse).FullName | Select-String -Pattern $pkg)
-	choco push $genpkg -source="$targetserver" -api-key="$apikey" -Verbose
+	choco push $genpkg --source="$targetserver" --api-key="$apikey" -Verbose
         Write-Output "------------------------------------------------------------------------"
         Write-Output ""
 	Pop-Location
