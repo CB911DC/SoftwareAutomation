@@ -299,8 +299,8 @@ if ($AdditonalPackages) {
     $boxstarterPackage = Join-Path $tempDir "chocosetup_boxstarter_install.ps1"
     $tmpPkgName = "ChocolateySetup_Boxstarter_Helper"
     @"
-Import-Module Boxstarter.Bootstrapper
-Import-Module Boxstarter.Chocolatey
+Import-Module `$env:APPDATA\Boxstarter\Boxstarter.Bootstrapper
+Import-Module `$env:APPDATA\Boxstarter\Boxstarter.Chocolatey
 New-PackageFromScript $boxstarterPackage $tmpPkgName
 `$Boxstarter.RebootOk=`$true
 `$Boxstarter.NoPassword=`$false
@@ -325,6 +325,6 @@ choco install $pkg -y
 if (Test-PendingReboot) { Invoke-Reboot }
 "@ | Out-File $boxstarterPackage -Encoding default -Append
     }
-    powershell.exe -file $boxstarterScript
+    powershell.exe -Command "refreshenv; $boxstarterScript"
   }
 }
