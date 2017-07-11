@@ -10,11 +10,11 @@ HANDLE GetProcessById(DWORD id) {
 HANDLE GetProcessByName(const std::string& name) {
 	HANDLE hProc = INVALID_HANDLE_VALUE;
 	ForEachProcess([name, &hProc](const PROCESSENTRY32& entry) -> HANDLE {
-		std::wstring wsName(entry.szExeFile);
-		std::string csName(wsName.begin(), wsName.end());
-		if (0 == csName.compare(name))
-		{
-			if (INVALID_HANDLE_VALUE == hProc) {
+		if (INVALID_HANDLE_VALUE == hProc) {
+			std::wstring wsName(entry.szExeFile);
+			std::string csName(wsName.begin(), wsName.end());
+			if (0 == csName.compare(name))
+			{
 				hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, entry.th32ProcessID);
 			}
 		}
