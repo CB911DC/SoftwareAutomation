@@ -37,10 +37,9 @@ void ForEachProcess(ProcessEntryHandler callback) {
 }
 
 void FindChildProcesses(DWORD pid, ProcessEntryHandler callback) {
-	ProcessEntryHandler f = [pid, callback](const PROCESSENTRY32& entry) -> void {
+	ForEachProcess([pid, callback](const PROCESSENTRY32& entry) -> void {
 		if (entry.th32ParentProcessID == pid) {
 			callback(entry);
 		}
-	};
-	ForEachProcess(f);
+	});
 }
