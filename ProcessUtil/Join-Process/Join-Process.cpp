@@ -4,16 +4,24 @@
 #include "stdafx.h"
 #include "InputParser.hpp"
 #include "ProcessWatcher.h"
+#include "ProcessUtils.h"
 
-const char* ARG_VERBOSE = "-v";
-const char* ARG_INTERVAL = "-i";
-const char* ARG_F_BY_NAME = "-name";
 const char* ARG_F_BY_ID = "-pid";
+const char* ARG_F_BY_NAME = "-name";
+const char* ARG_INTERVAL = "-i";
 const char* ARG_WAIT_FOR_CHILDREN = "-wait-for-children";
+const char* ARG_VERBOSE = "-v";
 
 void PrintUsage() {
 	std::cout << "Join-Process.exe " << std::endl;
-	std::cout << "usage: Join-Process [-pid <pid> | -name <process name>] [-i <sec>] [-wait-for-children] [-v] [-help]" << std::endl;
+	std::cout << "usage: Join-Process "
+		"[" << ARG_F_BY_ID << " <pid> "
+		"| " << ARG_F_BY_NAME << " <process name>] "
+		"[ " << ARG_INTERVAL << " <sec>] "
+		"[" << ARG_WAIT_FOR_CHILDREN << "] "
+		"[" << ARG_VERBOSE << "] "
+		"[-help | -h]" << std::endl;
+
 	std::cout << std::endl;
 	std::cout << "\t-help .................... Print this help text" << std::endl;
 	std::cout << "\t" << ARG_VERBOSE << "  ...................... be verbose" << std::endl;
@@ -40,8 +48,6 @@ bool CheckParamsValid(const InputParser& input) {
 	return true;
 }
 
-HANDLE GetProcessById(int id);
-HANDLE GetProcessByName(const std::string& str);
 
 int main(int argc, char* argv[])
 {
@@ -72,31 +78,4 @@ int main(int argc, char* argv[])
 	}
 	ProcessWatcher procWatch(hProc, input.cmdOptionExists(ARG_VERBOSE), interval);
 	return procWatch.Join(input.cmdOptionExists(ARG_WAIT_FOR_CHILDREN));
-}
-
-HANDLE GetProcessById(int id) {
-	return OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
-}
-
-HANDLE GetProcessByName(const std::string& name) {
-	HANDLE hProc = INVALID_HANDLE_VALUE;
-	const char* pName = name.c_str();
-	PROCESSENTRY32 entry;
-	entry.dwSize = sizeof(PROCESSENTRY32);
-	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-	if (TRUE == Process32First(snapshot, &entry))
-	{
-		while (TRUE == Process32Next(snapshot, &entry))
-		{
-			std::wstring wsName(entry.szExeFile);
-			std::string csName(wsName.begin(), wsName.end());
-			if (0 == _stricmp(csName.c_str(), pName))
-			{
-				hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, entry.th32ProcessID);
-				break;
-			}
-		}
-	}
-	CloseHandle(snapshot);
-	return hProc;
 }

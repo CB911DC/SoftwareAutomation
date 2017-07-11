@@ -149,12 +149,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputParser.hpp" />
+    <ClInclude Include="ProcessUtils.h" />
     <ClInclude Include="ProcessWatcher.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Join-Process.cpp" />
+    <ClCompile Include="ProcessUtils.cpp" />
     <ClCompile Include="ProcessWatcher.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
