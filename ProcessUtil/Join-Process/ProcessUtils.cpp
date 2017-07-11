@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ProcessUtils.h"
+#include <list>
 
 
 HANDLE GetProcessById(DWORD id) {
@@ -8,24 +9,16 @@ HANDLE GetProcessById(DWORD id) {
 
 HANDLE GetProcessByName(const std::string& name) {
 	HANDLE hProc = INVALID_HANDLE_VALUE;
-	const char* pName = name.c_str();
-	PROCESSENTRY32 entry;
-	entry.dwSize = sizeof(PROCESSENTRY32);
-	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-	if (TRUE == Process32First(snapshot, &entry))
-	{
-		while (TRUE == Process32Next(snapshot, &entry))
+	ForEachProcess([name, &hProc](const PROCESSENTRY32& entry) -> HANDLE {
+		std::wstring wsName(entry.szExeFile);
+		std::string csName(wsName.begin(), wsName.end());
+		if (0 == csName.compare(name))
 		{
-			std::wstring wsName(entry.szExeFile);
-			std::string csName(wsName.begin(), wsName.end());
-			if (0 == _stricmp(csName.c_str(), pName))
-			{
+			if (INVALID_HANDLE_VALUE == hProc) {
 				hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, entry.th32ProcessID);
-				break;
 			}
 		}
-	}
-	CloseHandle(snapshot);
+	});
 	return hProc;
 }
 
