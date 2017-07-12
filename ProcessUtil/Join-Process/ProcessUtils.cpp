@@ -9,7 +9,7 @@ HANDLE GetProcessById(DWORD id) {
 
 HANDLE GetProcessByName(const std::string& name) {
 	HANDLE hProc = INVALID_HANDLE_VALUE;
-	ForEachProcess([name, &hProc](const PROCESSENTRY32& entry) -> HANDLE {
+	ForEachProcess([name, &hProc](const PROCESSENTRY32& entry) -> void {
 		if (INVALID_HANDLE_VALUE == hProc) {
 			std::wstring wsName(entry.szExeFile);
 			std::string csName(wsName.begin(), wsName.end());
